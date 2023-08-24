@@ -40,40 +40,23 @@ socketConnection.connect = async function (io) {
 
         });
 
-        socket.on(SOCKET_EVENTS.TEST, (payload, callback) => {
-            console.log(payload,'=======================')
-            socket.emit(SOCKET_EVENTS.TEST, payload, (res) => { console.log(res); });
-            callback({ success: true, message: MESSAGES.SOCKET_IS_RUNNING_FINE });
-        });
-        const redis = require('redis');
+        // socket.on(SOCKET_EVENTS.TEST, (payload, callback) => {
+        //     socket.emit(SOCKET_EVENTS.TEST, payload, (res) => { console.log(res); });
+        //     callback({ success: true, message: MESSAGES.SOCKET_IS_RUNNING_FINE });
+        // });
 
-        (async () => {
+        // socket.on(SOCKET_EVENTS.CREATE_ROOM, async (payload, callback) => {
+        //     payload.userId = socket.id;
+        //     let response = await conversationController.createRoom(payload);
 
-            const client = redis.createClient();
-          
-            const subscriber = client.duplicate();
-          
-            await subscriber.connect();
-          
-              await subscriber.subscribe('chatRoom', (message) => {
-                  message = JSON.parse(message);
-                  global.io.sockets.emit(SOCKET_EVENTS.CREATE_ROOM, message);
-              console.log(message); // 'message'
-            });
-          })();
-        socket.on(SOCKET_EVENTS.CREATE_ROOM, async (payload, callback) => {
-            payload.userId = socket.id;
-            console.log(payload,'room-------------?');
-            let response = await conversationController.createRoom(payload);
-
-            payload.members.map( member => {
-                Array.from(io.sockets.sockets).map( socketArray => {
-                    socketArray[0] === member.toString() && socketArray[1].join(response.data._id.toString());
-                });
-            });
-            console.log(response.data);
-            callback({ success: true, message: response.message, data: response.data });
-        });
+        //     payload.members.map( member => {
+        //         Array.from(io.sockets.sockets).map( socketArray => {
+        //             socketArray[0] === member.toString() && socketArray[1].join(response.data._id.toString());
+        //         });
+        //     });
+        //     console.log(response.data);
+        //     callback({ success: true, message: response.message, data: response.data });
+        // });
 
         socket.on(SOCKET_EVENTS.GET_ROOMS, async (payload, callback) => {
      

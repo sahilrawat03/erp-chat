@@ -8,6 +8,6 @@ module.exports = {
     // gameController: require('./gameController'),
     conversationController: require('./conversationController'),
     notificationController: require('./notificationController'),
-    // redisController: require('./redisController'),
+    redisController: require('./redisController'),
     // rouletteController: require('./rouletteController'),
 };

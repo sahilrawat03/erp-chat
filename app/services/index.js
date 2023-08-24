@@ -9,5 +9,5 @@
     swaggerService: require('./swaggerService'),
     authService: require('./authService'),
     sessionService: require('./sessionService'),
-    dbService: require('./dbService'),
+     dbService: require('./dbService'),
 };

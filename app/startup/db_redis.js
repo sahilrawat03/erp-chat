@@ -13,7 +13,7 @@ if ( REDIS.PASSWORD ){
     redisCred.password = REDIS.PASSWORD;
 }
 
-global.pubClient = createClient(redisCred);
+global.pubClient = createClient();
 global.subClient = pubClient.duplicate();
 
 module.exports = async () => {
