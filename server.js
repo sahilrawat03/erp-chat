@@ -13,23 +13,7 @@ global.eventEmitter = new EventEmitter();
 /**creating express server app for server */
 const app = EXPRESS();
 
-const redis = require('redis');
-const { SOCKET_EVENTS } = require('./app/utils/constants');
 
-// (async () => {
-
-//     const client = redis.createClient();
-  
-//     const subscriber = client.duplicate();
-  
-//     await subscriber.connect();
-  
-//       await subscriber.subscribe('chatRoom', (message) => {
-//           message = JSON.parse(message);
-//           global.io.sockets.emit(SOCKET_EVENTS.CREATE_ROOM, message);
-//       console.log(message); // 'message'
-//     });
-//   })();
 
 app.set('port', SERVER.SOCKET_PORT);
 const server = require('http').Server(app);

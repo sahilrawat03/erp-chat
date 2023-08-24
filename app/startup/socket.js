@@ -3,8 +3,8 @@ const CONFIG = require('../../config');
 const { authService, userService } = require('../services');
 const { MESSAGES, SOCKET_EVENTS, S3_DEFAULT_PROFILE_IMAGE } = require('../utils/constants');
 const routeUtils = require('../utils/routeUtils');
-const { convertIdToMongooseId, lockFunction } = require('../utils/utils');
-const { conversationController, notificationController, gameController, rouletteController } = require('../controllers');
+const { convertIdToMongooseId } = require('../utils/utils');
+const { conversationController, notificationController, rouletteController } = require('../controllers');
 
 /** initialize **/
 let socketConnection = {};
@@ -19,7 +19,6 @@ socketConnection.connect = async function (io) {
             /** validate here **/
             try {
                 console.log('Socket hit :- ', packet[0]);
-                console.log(packet[0],'11111111');
                 await routeUtils.route(packet);
                 next();
             } catch (error) {

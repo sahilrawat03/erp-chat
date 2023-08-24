@@ -31,15 +31,12 @@ global.subClient.subscribe(REDIS_EVENTS.NOTIFICATION, async (payload) => {
     
     global.io.sockets.to(adminIds).emit(SOCKET_EVENTS.NOTIFICATION, payload);
 });
-console.log(global);
 global.subClient.subscribe(REDIS_EVENTS.ADD_ROOM, async (payload) => {
-    console.log('----------controller reddis',payload);
     payload = JSON.parse(payload);
     // payload.userId = socket.id;
 
-    let response = await conversationController.createRoom(payload);
+    await conversationController.createRoom(payload);
 
-    console.log('------------',payload,'redis');
     
     global.io.sockets.emit(SOCKET_EVENTS.CREATE_ROOM, payload);
 });

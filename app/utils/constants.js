@@ -169,49 +169,7 @@ CONSTANTS.SOCKET_EVENTS = {
     NEW_MESSAGE: 'newMessage',
     WALLET_BALANCE: 'walletBalance',
 
-    // Game events
-    GAME_CLOSED: 'gameClosedPoker',
-    PLAYERS_CONNECTED: 'playersConnectedPoker',
-    USER_CARDS: 'userCardsPoker',
-    DISRIBUTE_CARDS:'distributeCardsPoker',
-    PLAYER_LEFT: 'playerLeftPoker',
-    PLAYED_TURN: 'playedTurnPoker',
-    PLAYER_TURN: 'playerTurnPoker',
-    KICKOUT: 'kickoutPoker',
-    CURRENT_ROUND: 'currentRoundPoker',
-    GAME_WINNERS: 'gameWinnersPoker',
-    LEAVE_MATCH: 'leaveMatchPoker',
-    SOCKET_ERROR: 'SockerErrorPoker',
-    START_MATCH_MAKING: 'startMatchMakingPoker',
-    LOOSE_GAME: 'looseGamePoker',
-    PLAY_TURN: 'playTurnPoker',
-    RECONNECT_GAME: 'reconnectGamePoker',
-    SITTING_ARRANGEMENT:'sittingArrangementPoker',
-    TOURNAMENT_COMPLETED:'tournamentCompletedPoker',
-    IS_NEXT_ROUND_POSSIBLE: 'isNextRoundPossiblePoker',
-    GAME_COMPLETED: 'gameCompletedPoker',
-    GAME_JOINED: 'gameJoinedPoker',
-    RECONNETED: 'reconnected',
-    TRADE_IN: 'tradeInPoker',
-    TRADE_IN_USER_CARDS: 'tradeInUserCardsPoker',
-    
-    START_MATCH_MAKING_ROULETTE: 'startMatchMakingRoulette',
-    LOOSE_GAME_ROULETTE: 'looseGameRoulette',
-    LEAVE_MATCH_ROULETTE: 'leaveMatchRoulette',
-    APPLY_ROULETTE_BET: 'applyRouletteBet',
-    RECONNECT_GAME_ROULETTE: 'reconnectGameRoulette',
-    SITTING_ARRANGEMENT_ROULETTE:'sittingArrangementRoulette',
-    TOURNAMENT_COMPLETED_ROULETTE:'tournamentCompletedRoulette',
-    GAME_JOINED_ROULETTE: 'gameJoinedRoulette',
-    GAME_CLOSED_ROULETTE: 'gameClosedRoulette',
-    PLAYER_KNOCK_OUT_ROULETTE: 'playerKnockOutRoulette',
-    ROULETTE_PLAYERS_RESULT: 'playersRouletteResult',
-    ROULETTE_NEW_GAME_START_TIME: 'rouletteNewGameStartTime',
-    ROULETTE_RESULT: 'rouletteResult',
-    PLAYERS_CONNECTED_ROULETTE: 'playersConnectedRoulette',
-    APPLY_BETS_ROULETTE: 'applyBetsForRoulette',
-    APPLIED_ROULETTE_BET: 'appliedRouletteBet',
-    ROULETTE_TABLE_WINNER_SYMBOLS: 'rouletteWinnerSymbols',
+
 
     // Notification events
     NOTIFICATION: 'notification',
@@ -243,31 +201,6 @@ CONSTANTS.MESSAGE_TYPES = {
 
 CONSTANTS.MATCH_MAKING_TIMER = 30000;
 
-CONSTANTS.GAME_STATUS = {
-	MATCH_MAKING_STARTED: 1,
-	ON_GOING: 2,
-	FINISHED: 3
-};
-
-CONSTANTS.GAME = {
-	SETTING: {
-		NAME_PREFIX: 'LUXE_',
-		MIN_PLAYERS: 2,
-		MAX_PLAYERS: 9,
-		DETAILS: {
-		name: 'Luxe Poker',
-		},
-	},
-	TABLE_LIMIT: {
-		NO_LIMIT: 'no_limit',
-		LIMIT: 'limit',
-		POT_LIMIT: 'pot_limit',
-	},
-	TABLE_TYPE: {
-		NORMAL: 'normal',
-		FAST: 'fast',
-	},
-};
 
 CONSTANTS.ANIMATION_CATEGORY = {
     NORMAL: 1,
@@ -295,13 +228,6 @@ CONSTANTS.TOURNAMENT_STATUS = {
 CONSTANTS.CURRENT_ROUND = {
     IN_PROGRESS: 1,
     COMPLETED: 2
-};
-
-CONSTANTS.POKER_GAME_TYPE = {
-	NORMAL: 0,
-	TOURNAMENT: 1,
-	CHALLENGER_GAME: 2,
-	REMATCH: 3
 };
 
 CONSTANTS.PLAYER_ACTION = {
@@ -400,12 +326,6 @@ CONSTANTS.SUBSCRIPTION_FREQUENCY = {
     QUATERLY: 2
 };
 
-CONSTANTS.GAME_SETTING = {
-    NAME_PREFIX: 'LUXE_',
-    MIN_PLAYERS: 2,
-    MAX_PLAYERS: 9
-};
-
 CONSTANTS.TABLE_LIMIT = {
     NO_LIMIT: 'no_limit',
     LIMIT: 'limit',
@@ -423,49 +343,6 @@ CONSTANTS.TIMER_TYPE = {
     APPLY_BET_TIMER: 3
 };
 
-CONSTANTS.GAME_PARAMETERS = {
-    EACH_PLAYER_CARDS_COUNT: 2,
-    TABLE_CARDS_COUNT: 5,
-    DELAY_AFTER_EACH_PLAYER_CARD_DISTRIBUTION: 1000,
-    DELAY_AFTER_CARDS_DISTRIBUTION: 2000,
-    PLAYER_TURN_TIMEOUT: 30000,
-};
-
-CONSTANTS.DUMMY_JSON = {
-    PLAYER_TURN: {
-        tableId: '',
-        playerId: '',
-        timer: 30,
-        maxTimer: 30,
-        buttonAction: {
-            allIn: true,
-            check: false,
-            call: false,
-            raise: true,
-            minRaise: 100,
-            maxRaise: 200,
-            callAmount: 0,
-            allInAmount: 0,
-            tradeIn: false,
-            tradeInLimit: 0
-        }
-    },
-    PLAYED_TURN: {
-        action: {
-            playerId: '',
-            tableId: '',
-            betAmount: 0,
-            action: 1,
-            chipsLeft: 0
-        }
-    }
-};
-
-CONSTANTS.ROULETTE_TYPE = {
-    AMERICAN: 1,
-    EUROPEAN: 2,
-    FRENCH: 3
-};
 
 CONSTANTS.SUIT_TYPE = {
     SINGLE: 1,
@@ -488,11 +365,6 @@ CONSTANTS.SYMBOL_COLOR = {
 CONSTANTS.SYMBOL_TYPE = {
     ODD: 1,
     EVEN: 2
-};
-
-CONSTANTS.SLOT_GAME_THEME_VERSION = {
-    OLD: 1,
-    NEW: 2
 };
 
 CONSTANTS.SPINE_TYPE = {

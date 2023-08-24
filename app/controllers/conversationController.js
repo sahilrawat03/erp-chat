@@ -18,7 +18,6 @@ let conversationController = {};
  * @returns 
  */
 conversationController.createRoom = async (payload) => {
-     console.log(payload,'<------------- create room');
     let dataToSave = {
         createdBy: payload.userId, updateBy: payload.userId,
         interviewId: payload.interviewId
@@ -43,7 +42,6 @@ conversationController.createRoom = async (payload) => {
 
     let room = await dbService.findOne(ConversationRoomModel, { members: { $size: payload.members.length }, interviewId:  payload.interviewId  });
     if (room) {
-        console.log('already');
         return createSuccessResponse(MESSAGES.SUCCESS, room);
     }
 
@@ -125,7 +123,6 @@ conversationController.getGroupConversation = async (payload) => {
 
     // setting users message status to seen
     let data=await dbService.updateMany(ConversationModel, { roomId: convertIdToMongooseId(payload.roomId), senderId: { $ne: convertIdToMongooseId(payload.userId) } }, { $addToSet: { receivedBy: convertIdToMongooseId(payload.userId) }, $set: { messageStatus: MESSAGE_STATUS.SEEN } });
-console.log(data,'================================');
     const conversationList = await dbService.aggregate(ConversationModel, conversationAggregateQuery);
 
     return createSuccessResponse(MESSAGES.CONVERSATION.LIST_FETCHED, conversationList);

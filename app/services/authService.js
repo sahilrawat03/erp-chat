@@ -131,15 +131,6 @@ let validatePermission = async (request, permission) => {
 /** -- function to authenticate socket token */
 authService.socketAuthentication = async (socket, next) => {    
     try {
-        console.log('---');
-        // let data = axios.post(`http://localhost:4001/v1/auth/check_authenticated`, {}, { authorization: socket.handshake.query.authorization });
-        // console.log(data);
-//   .then(response => {
-//     console.log('Response:');
-//   })
-//   .catch(error => {
-//     console.error('Error:');
-//   });
         let userData = await axios.post(`http://localhost:4001/v1/auth/check_authenticated`, { },
             { headers: {  authorization: socket.handshake.query.authorization   } }
         );
@@ -149,9 +140,7 @@ authService.socketAuthentication = async (socket, next) => {
         if (!session) {
             return next({ success: false, message: MESSAGES.UNAUTHORIZED });
         }
-        // console.log(session, '88888888888888888888888888');
-        // let user = await userService.findOne({ _id: session._id }, { userType: 1, email: 1, lastLoginDate:1, firstName: 1, lastName: 1, profileImage: 1, isResponsibleGamingOn: 1 });
-        if (!userData) {
+       if (!userData) {
             return next({ success: false, message: MESSAGES.UNAUTHORIZED });
         }
 
