@@ -9,5 +9,4 @@ module.exports = {
     conversationController: require('./conversationController'),
     notificationController: require('./notificationController'),
     redisController: require('./redisController'),
-    // rouletteController: require('./rouletteController'),
 };

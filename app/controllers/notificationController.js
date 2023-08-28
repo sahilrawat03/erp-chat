@@ -22,14 +22,6 @@ notificationController.saveNotification = async (payload) => {
     return notification;
 };
 
-/**
- * Function to check user balance.
- * @param {*} payload 
- * @returns 
- */
-notificationController.userBalance = async (payload) => {
-    return await dbService.findOne(UserWalletModel, { userId: payload.userId }, { userId: 1, luxeTokens: 1, walletBalance: true });  
-};
 
 /**
  * Function to list notifications.

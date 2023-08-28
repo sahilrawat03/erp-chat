@@ -3,7 +3,7 @@
 const CONFIG = require('./../../config');
 const { MESSAGES, PAGINATION, S3_DEFAULT_PROFILE_IMAGE, SORTING, MESSAGE_STATUS, ERROR_TYPES } = require('../utils/constants');
 const { ConversationRoomModel, ConversationModel } = require('../models');
-const { userService, dbService } = require('../services');
+const {  dbService } = require('../services');
 const { createSuccessResponse, createErrorResponse } = require('../helpers');
 const { convertIdToMongooseId } = require('../utils/utils');
 
@@ -22,12 +22,6 @@ conversationController.createRoom = async (payload) => {
         createdBy: payload.userId, updateBy: payload.userId,
         interviewId: payload.interviewId
     };
-
-    // check if the members sent in payload is exist users or not.
-    // let existingUsers = await userService.find({ _id: { $in: payload.members } });
-    // if (existingUsers.length != payload.members.length) {
-    //     return createErrorResponse(MESSAGES.CONVERSATION.MEMBERS_DONT_EXIST, ERROR_TYPES.DATA_NOT_FOUND);
-    // }
     if(payload.roomId){
 
         payload.members = payload.members.map((user) => {
@@ -122,7 +116,7 @@ conversationController.getGroupConversation = async (payload) => {
     await dbService.findOneAndUpdate(ConversationRoomModel, { _id: convertIdToMongooseId(payload.roomId), 'members.userId': { $in: [payload.userId] } }, { $set: { 'members.$.unreadCount': 0 } });
 
     // setting users message status to seen
-    let data=await dbService.updateMany(ConversationModel, { roomId: convertIdToMongooseId(payload.roomId), senderId: { $ne: convertIdToMongooseId(payload.userId) } }, { $addToSet: { receivedBy: convertIdToMongooseId(payload.userId) }, $set: { messageStatus: MESSAGE_STATUS.SEEN } });
+    await dbService.updateMany(ConversationModel, { roomId: convertIdToMongooseId(payload.roomId), senderId: { $ne: convertIdToMongooseId(payload.userId) } }, { $addToSet: { receivedBy: convertIdToMongooseId(payload.userId) }, $set: { messageStatus: MESSAGE_STATUS.SEEN } });
     const conversationList = await dbService.aggregate(ConversationModel, conversationAggregateQuery);
 
     return createSuccessResponse(MESSAGES.CONVERSATION.LIST_FETCHED, conversationList);
@@ -134,8 +128,6 @@ conversationController.getGroupConversation = async (payload) => {
  * @returns 
  */
 conversationController.getUserRooms = async (payload) => {
-    console.log('hii');
-    console.log(payload,'payload hai')
 
     let newMatchQuery = {};
 

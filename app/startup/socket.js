@@ -4,7 +4,7 @@ const { authService, userService } = require('../services');
 const { MESSAGES, SOCKET_EVENTS, S3_DEFAULT_PROFILE_IMAGE } = require('../utils/constants');
 const routeUtils = require('../utils/routeUtils');
 const { convertIdToMongooseId } = require('../utils/utils');
-const { conversationController, notificationController, rouletteController } = require('../controllers');
+const { conversationController, notificationController } = require('../controllers');
 
 /** initialize **/
 let socketConnection = {};
@@ -33,29 +33,7 @@ socketConnection.connect = async function (io) {
 
             console.log('Disconnected socket id is ', socket.id);
             await userService.findOneAndUpdate({ _id: convertIdToMongooseId(socket.id) }, { $set: { lastLoginDate: new Date(), isOnline: false, lastloginSession: (Math.floor((Date.now() - new Date(socket.user.lastLoginDate).getTime())/1000))}});
-
-            // update user ststau on roulette table if exists.
-            await rouletteController.updateRouletteTable({ userId: socket.id });
-
         });
-
-        // socket.on(SOCKET_EVENTS.TEST, (payload, callback) => {
-        //     socket.emit(SOCKET_EVENTS.TEST, payload, (res) => { console.log(res); });
-        //     callback({ success: true, message: MESSAGES.SOCKET_IS_RUNNING_FINE });
-        // });
-
-        // socket.on(SOCKET_EVENTS.CREATE_ROOM, async (payload, callback) => {
-        //     payload.userId = socket.id;
-        //     let response = await conversationController.createRoom(payload);
-
-        //     payload.members.map( member => {
-        //         Array.from(io.sockets.sockets).map( socketArray => {
-        //             socketArray[0] === member.toString() && socketArray[1].join(response.data._id.toString());
-        //         });
-        //     });
-        //     console.log(response.data);
-        //     callback({ success: true, message: response.message, data: response.data });
-        // });
 
         socket.on(SOCKET_EVENTS.GET_ROOMS, async (payload, callback) => {
      
@@ -141,14 +119,6 @@ socketConnection.connect = async function (io) {
             await conversationController.messageUpdate(payload);
 
             callback({ success: true, message: MESSAGES.MESSAGE_READ });
-        });
-
-        socket.on(SOCKET_EVENTS.WALLET_BALANCE, async (payload, callback) => {
-
-            payload.userId = socket.id;
-            let response = await notificationController.userBalance(payload);
-    
-            callback({ success: true, message: MESSAGES.USER_BALANCE_SUCCESSFULLY, data: response });
         });
 
         socket.on(SOCKET_EVENTS.USER_UNREAD_COUNT, async (payload, callback) => {

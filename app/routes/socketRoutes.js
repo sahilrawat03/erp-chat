@@ -105,16 +105,7 @@ let routes = [
         group: 'message',
         description: 'socket event to get Room\'s unread Count.'
     }
-    // {
-    //     action: 'on',
-        // eventName: SOCKET_EVENTS.APPLY_ROULETTE_BET,
-    //     joiSchemaForSocket: {
-    //         table: Joi.number().default(0).optional(),
-    //         limit: Joi.number().default(10).optional(),
-    //     },
-    //     group: 'message',
-    //     description: 'socket event to clear notifications.'
-    // }
+
 ];
 
 module.exports = routes;
