@@ -336,7 +336,6 @@ commonFunctions.createSession = async (payload) => {
             userType: payload.userType,
             tokenType: payload.tokenType || CONSTANTS.TOKEN_TYPES.LOGIN
         };
-        // await sessionModel.findOneAndUpdate({ userId: payload.userId }, sessionData, { upsert: true });
     }
     return sessionData.token;
 };

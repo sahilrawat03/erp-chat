@@ -3,15 +3,7 @@ const { Joi } = require('../utils/joiUtils');
 const { SOCKET_EVENTS, MESSAGE_TYPES } = require('../utils/constants');
 
 let routes = [
-    // {
-    //    action: 'emit',
-    //    eventName: 'test',
-    //     joiSchemaForSocket: {
-    //         data: Joi.string().required(),
-    //     },
-    //    group: 'message',
-    //    description: 'socket event for send message'
-    // }, 
+
     {
         action: 'emit',
         eventName: SOCKET_EVENTS.READ_MESSAGE,

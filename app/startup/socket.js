@@ -1,9 +1,8 @@
 /** -- import all modules */
 const CONFIG = require('../../config');
-const { authService, userService } = require('../services');
+const { authService  } = require('../services');
 const { MESSAGES, SOCKET_EVENTS, S3_DEFAULT_PROFILE_IMAGE } = require('../utils/constants');
 const routeUtils = require('../utils/routeUtils');
-const { convertIdToMongooseId } = require('../utils/utils');
 const { conversationController, notificationController } = require('../controllers');
 
 /** initialize **/
@@ -27,12 +26,10 @@ socketConnection.connect = async function (io) {
             }  
         });
 
-        // await userService.findOneAndUpdate({ _id: convertIdToMongooseId(socket.id) }, { $set: { lastLoginDate: new Date(), isOnline: true }});
 
         socket.on(SOCKET_EVENTS.DISCONNECT, async () => {
 
             console.log('Disconnected socket id is ', socket.id);
-            await userService.findOneAndUpdate({ _id: convertIdToMongooseId(socket.id) }, { $set: { lastLoginDate: new Date(), isOnline: false, lastloginSession: (Math.floor((Date.now() - new Date(socket.user.lastLoginDate).getTime())/1000))}});
         });
 
         socket.on(SOCKET_EVENTS.GET_ROOMS, async (payload, callback) => {
