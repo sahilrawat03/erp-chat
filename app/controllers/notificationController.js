@@ -1,6 +1,6 @@
 "use strict";
 
-const { NotificationModel, UserWalletModel } = require('../models');
+const { NotificationModel } = require('../models');
 const { dbService } = require('../services');
 const { convertIdToMongooseId } = require('./../utils/utils');
 

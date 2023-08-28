@@ -30,7 +30,7 @@ fileUploadService.extractZipFile = async (payload, s3Path) => {
 
     const destPath = path.resolve('./data/zips', `${s3Path}.zip`);
     fs.writeFileSync(destPath, payload.file.buffer);
-    await fs.createReadStream(destPath).pipe(unzipper.Extract({ path: `./data/unzip/${s3Path}` })).promise()
+    await fs.createReadStream(destPath).pipe(unzipper.Extract({ path: `./data/unzip/${s3Path}` })).promise();
 
     function walkSync(currentDirPath, callback) {
 
@@ -145,7 +145,7 @@ fileUploadService.uploadFile = async (payload, pathToUpload, pathOnServer) => {
 
         fileName = Date.now().toString(36);
         await fileUploadService.extractZipFile(payload, fileName);
-        return `theme/${fileName}`
+        return `theme/${fileName}`;
     }
     else if (payload.type == FILE_UPLOAD_TYPE.PRIZE_IMAGE) {
         fileName = `prizeImage/${fileName}`;
@@ -175,10 +175,10 @@ fileUploadService.getS3File = async (payload, bucketName) => {
                 }
             }
             else {
-                resolve(data)
+                resolve(data);
             }
         });
-    })
+    });
 };
 
 module.exports = fileUploadService;
