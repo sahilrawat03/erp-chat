@@ -5,6 +5,7 @@ const { MESSAGES, PAGINATION, S3_DEFAULT_PROFILE_IMAGE, SORTING, MESSAGE_STATUS,
 const { ConversationRoomModel, ConversationModel } = require('../models');
 const {  dbService } = require('../services');
 const { createSuccessResponse, createErrorResponse } = require('../helpers');
+const axios = require('axios');
 const { convertIdToMongooseId } = require('../utils/utils');
 
 /**************************************************
@@ -89,6 +90,7 @@ conversationController.saveMessage = async (payload) => {
  * @returns 
  */
 conversationController.getGroupConversation = async (payload) => {
+    let userDatas = await axios.get(`http://localhost:4001/v1/dropdown/user`);
 
     let conversationAggregateQuery = [
         { $match: { roomId: convertIdToMongooseId(payload.roomId) } },
@@ -118,8 +120,20 @@ conversationController.getGroupConversation = async (payload) => {
     // setting users message status to seen
     await dbService.updateMany(ConversationModel, { roomId: convertIdToMongooseId(payload.roomId), senderId: { $ne: convertIdToMongooseId(payload.userId) } }, { $addToSet: { receivedBy: convertIdToMongooseId(payload.userId) }, $set: { messageStatus: MESSAGE_STATUS.SEEN } });
     const conversationList = await dbService.aggregate(ConversationModel, conversationAggregateQuery);
-
-    return createSuccessResponse(MESSAGES.CONVERSATION.LIST_FETCHED, conversationList);
+    const userIdToNameMap = {};
+    userDatas.data.data.forEach(user => {
+      userIdToNameMap[user._id.toString()] = user.name;
+    });
+     let conversationData;
+    for (let room of conversationList) {
+        conversationData = {
+              room: room.messageData.map(member => ({
+                  ...member,
+              senderName: userIdToNameMap[member.senderId],
+          }))
+        };
+    }
+    return createSuccessResponse(MESSAGES.CONVERSATION.LIST_FETCHED, conversationData);
 };
 
 /**
@@ -128,15 +142,8 @@ conversationController.getGroupConversation = async (payload) => {
  * @returns 
  */
 conversationController.getUserRooms = async (payload) => {
-
-    let newMatchQuery = {};
-
-    if (payload.searchKey) {
-        newMatchQuery['$or'] = [
-            { 'userData.firstName': { $regex: payload.searchKey, $options: 'i' } },
-            { 'userData.lastName': { $regex: payload.searchKey, $options: 'i' } }
-        ];
-    }
+    console.log(payload.userId);
+    let userDatas = await axios.get(`http://localhost:4001/v1/dropdown/user`);
 
     let roomListAggregateQuery = [
         { $match: { 'members.userId': convertIdToMongooseId(payload.userId) }},
@@ -146,7 +153,8 @@ conversationController.getUserRooms = async (payload) => {
                 as: 'member',
                 cond: { $ne: [ '$$member.userId', convertIdToMongooseId(payload.userId) ] }
             }}
-        }},
+        }
+        },
         { $lookup: {
             from: 'conversation',
             let: { conversationRoomId: '$_id' },
@@ -158,15 +166,6 @@ conversationController.getUserRooms = async (payload) => {
             as: 'conversation'
         }},
         { $unwind: { path: '$conversation', preserveNullAndEmptyArrays: true } },
-        { $lookup: {
-            from: 'users',
-            localField: 'users.userId',
-            foreignField: '_id',  
-            as: 'userData'
-        }},
-        { $unwind: { path: '$userData', preserveNullAndEmptyArrays: true } },
-        { $match : newMatchQuery },
-        { $sort: { 'conversation.createdAt': -1 } },
         { $addFields: { 'userUnreadCount': {
             $filter: {
                 input: '$members',
@@ -178,23 +177,34 @@ conversationController.getUserRooms = async (payload) => {
         { $project: {
             _id: 1,
             members: 1,
-            name: { $concat: [ '$userData.firstName', ' ', '$userData.lastName' ] },
-            isOnline: '$userData.isOnline',
-            userId: '$userData._id',
             profileImage: { $concat: [ CONFIG.S3_BUCKET.cloudfrontUrl, '/', { $ifNull: [ '$userData.profileImage', S3_DEFAULT_PROFILE_IMAGE ] } ] },
-            lastLoginDate: '$userData.lastLoginDate',
             unreadCount: '$userUnreadCount.unreadCount',
             lastMessage: { $cond: [ '$conversation.message', '$conversation.message', '$conversation.fileName']}
         }}
     ];
     let roomData = await dbService.aggregate(ConversationRoomModel, roomListAggregateQuery);
-
+    const userIdToNameMap = {};
+    userDatas.data.data.forEach(user => {
+      userIdToNameMap[user._id.toString()] = user.name;
+    });
+    // Map the user names to the group members
+    let groupWithMappedNames;
+    for (let room of roomData) {
+        
+          groupWithMappedNames = {
+          ...room,
+          members: room.members.map(member => ({
+            ...member,
+            name: userIdToNameMap[member.userId.toString()]
+          }))
+        };
+    }
     let roomIds = roomData.map(room => room._id);
 
     // setting users message status to delivered
     await dbService.updateMany(ConversationModel, { roomId: { $in: roomIds }, messageStatus: { $ne: MESSAGE_STATUS.SEEN } }, { $set: { messageStatus: MESSAGE_STATUS.DELIVERED } });
 
-    return roomData;
+    return groupWithMappedNames;
 };
 
 conversationController.messageUpdate = async (payload) => {

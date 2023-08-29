@@ -8,6 +8,6 @@
     socketService: require('./socketService'),
     swaggerService: require('./swaggerService'),
     authService: require('./authService'),
-    sessionService: require('./sessionService'),
+   //  sessionService: require('./sessionService'),
      dbService: require('./dbService'),
 };
