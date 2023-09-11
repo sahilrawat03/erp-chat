@@ -77,7 +77,7 @@ let defaults = {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'access-key-id',
         secretAccessKey: process.env.AWS_SECRET_ACESS_KEY || 'secret-access-key',
         bucketName: process.env.S3_BUCKET_NAME || 'bucket-name',
-        cloudfrontUrl: process.env.CLOUDFRONT_URL || 'cloudfront-url'
+        cloudfrontUrl: process.env.CLOUDFRONT_URL || 'cloudfronturl'
     },
     AWS: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID || `aws_access_key`,

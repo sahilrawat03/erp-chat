@@ -7,6 +7,7 @@ const {  dbService } = require('../services');
 const { createSuccessResponse, createErrorResponse } = require('../helpers');
 const axios = require('axios');
 const { convertIdToMongooseId } = require('../utils/utils');
+const { API_GATEWAY_URL } = require('../../config/microserviceConfig');
 
 /**************************************************
 ***************** Conversation controller ***************
@@ -55,7 +56,6 @@ conversationController.createRoom = async (payload) => {
  * @returns 
  */
 conversationController.roomInformation = async (payload) => {
-    console.log(payload);
     return await dbService.findOne(ConversationRoomModel, {
         _id: convertIdToMongooseId(payload.roomId)
         // 'memebers.userId': { $in: [convertIdToMongooseId(payload.userId)] }
@@ -68,6 +68,7 @@ conversationController.roomInformation = async (payload) => {
  * @returns 
  */
 conversationController.saveMessage = async (payload) => {
+    let userDatas = await axios.get(`${API_GATEWAY_URL}/v1/dropdown/user`);
 
     let dataToSave = { senderId: payload.userId, readBy: [payload.userId], ...payload };
     let message = await dbService.create(ConversationModel, dataToSave);
@@ -81,6 +82,7 @@ conversationController.saveMessage = async (payload) => {
 
     // setting senders unread count to zero   
     await dbService.findOneAndUpdate(ConversationRoomModel, { _id: payload.roomId, 'members.userId': { $in: [payload.userId] } }, { $set: { 'members.$.unreadCount': 0 } });
+    message.senderName = (userDatas.data.data.find((i) => i._id == message.senderId.toString())).name;
     return message;
 };
 
@@ -90,8 +92,7 @@ conversationController.saveMessage = async (payload) => {
  * @returns 
  */
 conversationController.getGroupConversation = async (payload) => {
-    let userDatas = await axios.get(`http://localhost:4001/v1/dropdown/user`);
-
+    let userDatas = await axios.get(`${API_GATEWAY_URL}/v1/dropdown/user`);
     let conversationAggregateQuery = [
         { $match: { roomId: convertIdToMongooseId(payload.roomId) } },
         { $sort: { createdAt: -1 } },
@@ -124,16 +125,15 @@ conversationController.getGroupConversation = async (payload) => {
     userDatas.data.data.forEach(user => {
       userIdToNameMap[user._id.toString()] = user.name;
     });
-     let conversationData;
-    for (let room of conversationList) {
-        conversationData = {
-              room: room.messageData.map(member => ({
-                  ...member,
-              senderName: userIdToNameMap[member.senderId],
-          }))
-        };
+    for ( let index = 0; index < conversationList.length; index++){
+        let messageData = conversationList[index].messageData;
+
+        conversationList[index].messageData = messageData.map(member => ({
+            ...member,
+            senderName: userIdToNameMap[member.senderId],
+        }));
     }
-    return createSuccessResponse(MESSAGES.CONVERSATION.LIST_FETCHED, conversationData);
+    return createSuccessResponse(MESSAGES.CONVERSATION.LIST_FETCHED, conversationList);
 };
 
 /**
@@ -143,7 +143,7 @@ conversationController.getGroupConversation = async (payload) => {
  */
 conversationController.getUserRooms = async (payload) => {
     console.log(payload.userId);
-    let userDatas = await axios.get(`http://localhost:4001/v1/dropdown/user`);
+    let userDatas = await axios.get(`${API_GATEWAY_URL}/v1/dropdown/user`);
 
     let roomListAggregateQuery = [
         { $match: { 'members.userId': convertIdToMongooseId(payload.userId) }},

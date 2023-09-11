@@ -14,10 +14,10 @@ socketConnection.connect = async function (io) {
         console.log('connection established', socket.id);
         
         socket.use(async (packet, next) => {
-            console.log('Socket hit:=>', packet);
+            // console.log('Socket hit:=>', packet);
             /** validate here **/
             try {
-                console.log('Socket hit :- ', packet[0]);
+                // console.log('Socket hit :- ', packet[0]);
                 await routeUtils.route(packet);
                 next();
             } catch (error) {
@@ -38,7 +38,6 @@ socketConnection.connect = async function (io) {
             payload.userId = socket.id;
 
             let roomsData = await conversationController.getUserRooms(payload);
-            console.log(roomsData);
 
             callback({ success: true, message: MESSAGES.ROOM_FETCHED_SUCCESSFULLY, data: roomsData });
         });
@@ -48,7 +47,6 @@ socketConnection.connect = async function (io) {
             payload.userId = socket.id;
 
             let roomData = await conversationController.roomInformation(payload);
-            console.log(roomData);
             if (!roomData){
                 callback({ success: false, message: MESSAGES.CONVERSATION.NOT_FOUND });
             }
@@ -58,10 +56,11 @@ socketConnection.connect = async function (io) {
             payload.newMessage = true;
             payload.fileType = message.fileType;
             payload.fileUrl = message.fileUrl;
-            payload.userName = socket.user.firstName + " " +  socket.user.lastName;
+            payload.createdAt = new Date();
+            payload.senderName = socket.user.name;
             payload.profileImage = CONFIG.S3_BUCKET.cloudfrontUrl + '/' + (!socket.user.profileImage ? S3_DEFAULT_PROFILE_IMAGE : socket.user.profileImage);
-            
             socket.to(payload.roomId).emit(SOCKET_EVENTS.NEW_MESSAGE, payload);
+            // io.emit(SOCKET_EVENTS.NEW_MESSAGE, payload);
 
             callback({ success: true, message: MESSAGES.MESSAGE_SENT, data: message });
         });
@@ -71,13 +70,11 @@ socketConnection.connect = async function (io) {
             payload.userId = socket.id;
 
             let roomData = await conversationController.roomInformation(payload); 
-            console.log(roomData,'roomdata');
             if (!roomData){
                 callback({ success: false, message: MESSAGES.CONVERSATION.NOT_FOUND });
             }
 
             let response = await conversationController.getGroupConversation(payload);
-            console.log(response.data[0]);
 
             callback({ success: true, message: response.msg, data: response.data });
         });
@@ -119,12 +116,10 @@ socketConnection.connect = async function (io) {
         });
 
         socket.on(SOCKET_EVENTS.USER_UNREAD_COUNT, async (payload, callback) => {
-            console.log(payload);
             payload = {};
             payload.userId = socket.id;
 
             let response = await conversationController.getUserUnreadCount(payload);
-            console.log(response);
             response.userUnreadCount = true;
             callback({ success: true, message: MESSAGES.MESSAGE_READ, data: response.data });
         });

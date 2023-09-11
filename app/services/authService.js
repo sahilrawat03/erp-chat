@@ -9,6 +9,7 @@ const ConversationRoomModel = require('../models/conversationRoomModel');
 const userPermissionService = require('../services/userPermissionService');
 const { MESSAGES, ERROR_TYPES, AVAILABLE_AUTHS, NORMAL_PROJECTION, USER_TYPE } = require('../utils/constants');
 const axios = require('axios');
+const { API_GATEWAY_URL } = require('../../config/microserviceConfig');
 
 
 let authService = {};
@@ -131,11 +132,10 @@ let validatePermission = async (request, permission) => {
 /** -- function to authenticate socket token */
 authService.socketAuthentication = async (socket, next) => {    
     try {
-        let userData = await axios.post(`http://localhost:4001/v1/auth/check_authenticated`, { },
+        let userData = await axios.post(`${API_GATEWAY_URL}/v1/auth/check_authenticated`, { },
             { headers: {  authorization: socket.handshake.query.authorization   } }
         );
         userData = userData.data.data;
-        // console.log(userData);
         let session = decryptJwt(socket.handshake.query.authorization);
         if (!session) {
             return next({ success: false, message: MESSAGES.UNAUTHORIZED });
