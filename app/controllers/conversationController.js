@@ -1,13 +1,13 @@
 'use strict';
 
-const CONFIG = require('./../../config');
-const { MESSAGES, PAGINATION, S3_DEFAULT_PROFILE_IMAGE, SORTING, MESSAGE_STATUS, ERROR_TYPES } = require('../utils/constants');
-const { ConversationRoomModel, ConversationModel } = require('../models');
-const {  dbService } = require('../services');
-const { createSuccessResponse, createErrorResponse } = require('../helpers');
 const axios = require('axios');
+const CONFIG = require('./../../config');
+const { dbService } = require('../services');
+const { createSuccessResponse } = require('../helpers');
 const { convertIdToMongooseId } = require('../utils/utils');
 const { API_GATEWAY_URL } = require('../../config/microserviceConfig');
+const { ConversationRoomModel, ConversationModel } = require('../models');
+const { MESSAGES, PAGINATION, S3_DEFAULT_PROFILE_IMAGE, SORTING, MESSAGE_STATUS } = require('../utils/constants');
 
 /**************************************************
 ***************** Conversation controller ***************
@@ -22,9 +22,9 @@ let conversationController = {};
 conversationController.createRoom = async (payload) => {
     let dataToSave = {
         createdBy: payload.userId, updateBy: payload.userId,
-        interviewId: payload.interviewId
+        candidateId: payload.candidateId
     };
-    if(payload.roomId){
+    if (payload.roomId){
 
         payload.members = payload.members.map((user) => {
             return { userId: user };
@@ -36,7 +36,7 @@ conversationController.createRoom = async (payload) => {
 
     payload.members.push(payload.userId);
 
-    let room = await dbService.findOne(ConversationRoomModel, { members: { $size: payload.members.length }, interviewId:  payload.interviewId  });
+    let room = await dbService.findOne(ConversationRoomModel, { members: { $size: payload.members.length }, candidateId: payload.candidateId });
     if (room) {
         return createSuccessResponse(MESSAGES.SUCCESS, room);
     }
@@ -58,7 +58,6 @@ conversationController.createRoom = async (payload) => {
 conversationController.roomInformation = async (payload) => {
     return await dbService.findOne(ConversationRoomModel, {
         _id: convertIdToMongooseId(payload.roomId)
-        // 'memebers.userId': { $in: [convertIdToMongooseId(payload.userId)] }
     });
 };
 

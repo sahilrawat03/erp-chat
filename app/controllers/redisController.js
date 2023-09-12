@@ -15,9 +15,8 @@ let redisService = { };
  */
 global.subClient.subscribe(REDIS_EVENTS.ADD_ROOM, async (payload) => {
     payload = JSON.parse(payload);
-    // payload.userId = socket.id;
 
-    await conversationController.createRoom(payload);
+    await conversationController.createRoom({ _id: payload.candidateId, ...payload });
 });
 
 module.exports = redisService;

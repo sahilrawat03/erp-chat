@@ -6,6 +6,5 @@
  ********************************/
 module.exports = {
     ConversationModel: require('./conversationModel'),
-    ConversationRoomModel: require('./conversationRoomModel'),
-
+    ConversationRoomModel: require('./conversationRoomModel')
 };

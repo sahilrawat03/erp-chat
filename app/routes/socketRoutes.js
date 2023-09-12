@@ -19,7 +19,7 @@ let routes = [
         eventName: SOCKET_EVENTS.CREATE_ROOM,
         joiSchemaForSocket: {
             roomId: Joi.string().objectId().optional(),
-            interviewId: Joi.string().objectId().required(),
+            candidateId: Joi.string().objectId().required(),
             members: Joi.array().items(Joi.string().objectId()).min(1).required() 
         },
         group: 'message',

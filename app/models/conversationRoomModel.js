@@ -6,8 +6,6 @@ const Schema = MONGOOSE.Schema;
 
 /************* Conversation Room Model ***********/
 const conversationRoomSchema = new Schema({
-    name: { type: String },
-    interviewId:  { type: Schema.Types.ObjectId, ref: 'interviews' },
     lastMessageId: {type: Schema.Types.ObjectId, ref: 'conversation' },
     lastMessageSenderId: { type: Schema.Types.ObjectId, ref: 'users' },
     lastMessageTime: { type: Date },
