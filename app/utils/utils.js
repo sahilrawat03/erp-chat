@@ -4,12 +4,10 @@ const pino = require("pino");
 const MONGOOSE = require('mongoose');
 const CONSTANTS = require('./constants');
 const JWT = require("jsonwebtoken");
-const _ = require('lodash');
-const AsyncLock = require('async-lock');
 
 // const sessionModel = require('../models/sessionModel');
 const { createPinoBrowserSend, createWriteStream } = require("pino-logflare");
-const { AWS, SMTP, WEB_URL, ADMIN_WEB_URL, PINO, ENVIRONMENT } = require('../../config');
+const { AWS, SMTP, WEB_URL, ADMIN_WEB_URL, PINO } = require('../../config');
 
 const PINO_CRED = { apiKey: PINO.API_KEY, sourceToken: PINO.API_SECRET };
 
@@ -309,62 +307,6 @@ commonFunctions.logger = () => {
         );
     }
 
-};
-
-/**
- * function to create session
- * @param {*} payload 
- * @returns 
- */
-commonFunctions.createSession = async (payload) => {
-    let sessionData = {};
-
-    sessionData.token = commonFunctions.encryptJwt({
-        userId: payload.userId,
-        date: Date.now()
-    });
-
-    if(payload.tokenType === CONSTANTS.TOKEN_TYPES.OTP){
-        sessionData.token = commonFunctions.generateOTP(CONSTANTS.OTP_LENGTH);
-        sessionData.tokenExpDate = commonFunctions.generateExpiryTime(CONSTANTS.OTP_EXPIRIED_TIME_IN_SECONDS || 10);
-    }
-
-    if (ENVIRONMENT === 'development' || payload.tokenType != CONSTANTS.TOKEN_TYPES.LOGIN) {
-        sessionData = {
-            ...sessionData,
-            userId: payload.userId,
-            userType: payload.userType,
-            tokenType: payload.tokenType || CONSTANTS.TOKEN_TYPES.LOGIN
-        };
-    }
-    return sessionData.token;
-};
-
-/**
- * Function to suffle data.
- * @param {*} dataToSuffle 
- * @returns 
- */
-commonFunctions.shuffleData = (dataToSuffle) => { 
-    return _.shuffle(dataToSuffle);
-};
-
-/**
- * Function t lock function.
- * @param {*} lockKeys 
- * @param {*} funtionToExecute 
- * @param {*} functionCallData 
- * @returns 
- */
-commonFunctions.lockFunction = async (lockKeys, funtionToExecute, functionCallData = []) => {
-
-    let lock = new AsyncLock(), data;
-    await lock.acquire( lockKeys, async function (done) { 
-        data = await funtionToExecute(...functionCallData);
-        done();
-    }, {});
-
-    return data;
 };
 
 module.exports = commonFunctions;

@@ -9,10 +9,11 @@ const conversationRoomSchema = new Schema({
     lastMessageId: {type: Schema.Types.ObjectId, ref: 'conversation' },
     lastMessageSenderId: { type: Schema.Types.ObjectId, ref: 'users' },
     lastMessageTime: { type: Date },
-    members: [{
+    members: [ {
+        _id: false,
         userId: { type: Schema.Types.ObjectId, ref: 'users' },
         unreadCount: { type: Number, default: 0 }
-    }],
+    } ],
     status: { type: Number },
     createdBy: { type: Schema.Types.ObjectId, ref: 'users' },
     expiryTime: { type: Date },

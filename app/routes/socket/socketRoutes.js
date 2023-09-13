@@ -1,6 +1,6 @@
 'use strict';
-const { Joi } = require('../utils/joiUtils');
-const { SOCKET_EVENTS, MESSAGE_TYPES } = require('../utils/constants');
+const { Joi } = require('../../utils/joiUtils');
+const { SOCKET_EVENTS, MESSAGE_TYPES } = require('../../utils/constants');
 
 let routes = [
 

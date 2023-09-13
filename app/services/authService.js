@@ -1,28 +1,16 @@
 'use strict';
 
-const { API_AUTH_KEY } = require('../../config');
-const { decryptJwt } = require("../utils/utils");
-const { createErrorResponse } = require("../helpers");
-const userService = require('../services/userService');
-const dbService = require('../services/dbService');
-const ConversationRoomModel = require('../models/conversationRoomModel');
-const userPermissionService = require('../services/userPermissionService');
-const { MESSAGES, ERROR_TYPES, AVAILABLE_AUTHS, NORMAL_PROJECTION, USER_TYPE } = require('../utils/constants');
 const axios = require('axios');
-const { API_GATEWAY_URL } = require('../../config/microserviceConfig');
+const MICROSERVICE_CONFIG = require('../../config/microserviceConfig');
+const { decryptJwt } = require("../utils/utils");
+const dbService = require('../services/dbService');
+const { createErrorResponse } = require("../helpers");
+const { MESSAGES, ERROR_TYPES } = require('../utils/constants');
+const ConversationRoomModel = require('../models/conversationRoomModel');
+const { AUTHENTICATE_USER } = require('../../config/microserviceConfig');
 
 
 let authService = {};
-
-authService.validateApiKey = () => {
-    return (request, response, next) => {
-        if (request.headers['x-api-key'] == API_AUTH_KEY) {
-            return next();
-        }
-        let responseObject = createErrorResponse(MESSAGES.UNAUTHORIZED, ERROR_TYPES.UNAUTHORIZED);
-        return response.status(responseObject.statusCode).json(responseObject);
-    };
-};
 
 /**
  * function to authenticate user.
@@ -46,93 +34,37 @@ authService.userValidate = (authType) => {
     };
 };
 
-/**
- * function to validate user's token and fetch its details from the system. 
- * @param {} request 
- */
-let validateUser = async (request, authType) => {
+let getUser = async (token) => {
+    let axios = require('axios');
+    let url = MICROSERVICE_CONFIG.AUTHENTICATE_USER.GET_USER_AUTHENTICATE_API_URL;
+    return await axios.post(url, {}, { headers: { Authorization: token } });
+  };
+  
+  /**
+   * function to validate user's jwt token and fetch its details from the system. 
+   * @param {} request 
+   */
+  let validateUser = async (request) => {
     try {
-        let session = await decryptJwt(request.headers.authorization);
-        if (!session) {
-            return false;
-        }
-
-        let user = await userService.findOne({ _id: session.userId }, { ...NORMAL_PROJECTION, password: 0 });
-        await userService.findOneAndUpdate({ _id: session.userId }, { lastIPAddress: request.ip.split(':').slice(-1)[0] });
-        if (!user) {
-            return false;
-        }
-
-        if (authType == AVAILABLE_AUTHS.SUPER_ADMIN && user.userType != USER_TYPE.SUPER_ADMIN) {
-            return false;
-        } else if (authType == AVAILABLE_AUTHS.ADMIN && user.userType != USER_TYPE.ADMIN) {
-            return false;
-        } else if (authType == AVAILABLE_AUTHS.ADMIN_SUPER_ADMIN && !(user.userType == USER_TYPE.SUPER_ADMIN || user.userType == USER_TYPE.ADMIN)) {
-            return false;
-        }
-
-        if (user) {
-            request.session = {
-                token: request.headers.authorization
-            };
-            request.user = user;
+        let authenticatedUser = (await getUser(request.headers.authorization)).data.data;
+        if (authenticatedUser) {
+            authenticatedUser.accessToken = request.headers.authorization;
+            request.user = authenticatedUser;
             return true;
         }
         return false;
     } catch (err) {
-        return false;
-    }
-};
-
-/**
- * function to check user permission.
- */
-authService.checkPermission = (permission) => {
-    return (request, response, next) => {
-        validatePermission(request, permission).then((isAuthorized) => {
-            if (typeof (isAuthorized) == 'string') {
-                let responseObject = createErrorResponse(MESSAGES.FORBIDDEN(request.method, request.url), ERROR_TYPES.FORBIDDEN);
-                return response.status(responseObject.statusCode).json(responseObject);
-            }
-            if (isAuthorized) {
-                return next();
-            }
-            let responseObject = createErrorResponse(MESSAGES.UNAUTHORIZED, ERROR_TYPES.UNAUTHORIZED);
-            return response.status(responseObject.statusCode).json(responseObject);
-        }).catch(() => {
-            let responseObject = createErrorResponse(MESSAGES.UNAUTHORIZED, ERROR_TYPES.UNAUTHORIZED);
-            return response.status(responseObject.statusCode).json(responseObject);
-        });
-    };
-};
-
-/**
- * function to validate user's permission. 
- * @param {} request 
- */
-let validatePermission = async (request, permission) => {
-    try {
-        let user = request.user;
-
-        if (user.userType === USER_TYPE.SUPER_ADMIN){
-            return true;
-        } else if (user.userType === USER_TYPE.ADMIN){
-            let userPermission = (await userPermissionService.findOne({ userId: user._id }, NORMAL_PROJECTION)) || {};
-
-            if (userPermission[permission]){
-                return true;
-            }
-            return false;
+        if (err.code == 'ECONNREFUSED') {
+            return err.code;
         }
-    } catch (err) {
         return false;
     }
-};
+  };
 
 /** -- function to authenticate socket token */
 authService.socketAuthentication = async (socket, next) => {    
     try {
-        let userData = await axios.post(`${API_GATEWAY_URL}/v1/auth/check_authenticated`, { },
+        let userData = await axios.post(`${AUTHENTICATE_USER.API_GATEWAY_URL}/v1/auth/check_authenticated`, { },
             { headers: {  authorization: socket.handshake.query.authorization   } }
         );
         userData = userData.data.data;

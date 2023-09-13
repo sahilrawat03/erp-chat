@@ -18,7 +18,7 @@ socketConnection.connect = async function (io) {
             /** validate here **/
             try {
                 console.log('Socket hit :- ', packet[0]);
-                await routeUtils.route(packet);
+                await routeUtils.socketRoute(packet);
                 next();
             } catch (error) {
                 console.log(error.message);

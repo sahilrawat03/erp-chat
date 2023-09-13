@@ -1,12 +1,13 @@
 'use strict';
 
 /********************************
- **** Managing all the controllers ***
+ * Managing all the controllers *
  ********* independently ********
  ********************************/
+
 module.exports = {
-    // gameController: require('./gameController'),
+    redisController: require('./redisController'),
+    chatRoomController: require('./chatRoomController'),
     conversationController: require('./conversationController'),
     notificationController: require('./notificationController'),
-    redisController: require('./redisController'),
 };

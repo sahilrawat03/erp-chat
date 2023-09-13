@@ -180,14 +180,18 @@ CONSTANTS.SOCKET_EVENTS = {
     GET_ROOMS: 'getRooms',
     MESSAGE_SEEN: 'messageSeen',
     USER_UNREAD_COUNT: 'userUnreadCount',
-    READ_MESSAGE: 'readMessage'
+    READ_MESSAGE: 'readMessage',
+    INTERVIEW_REMINDER: 'interviewReminder',
 };
 
 CONSTANTS.REDIS_EVENTS = {
-    ADD_ROOM: 'chatRoom',
+    CHATROOM: 'chatRoom',
+    NOTIFICATION: 'notification'
 };
 
-
+CONSTANTS.NOTIFICATION_TYPE = {
+	INTERVIEW: 1
+};
 
 CONSTANTS.MESSAGE_TYPES = {
     TEXT: 1,

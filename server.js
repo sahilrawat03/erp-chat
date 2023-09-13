@@ -13,8 +13,6 @@ global.eventEmitter = new EventEmitter();
 /**creating express server app for server */
 const app = EXPRESS();
 
-
-
 app.set('port', SERVER.SOCKET_PORT);
 const server = require('http').Server(app);
 
@@ -33,14 +31,12 @@ global.io.use(p2p);
 ********************************/
 /** Server is running here */
 let startNodeserver = async () => {
-    // initialize mongodb 
-    await require('./app/startup/db_mongo')();
-    
-    await require('./app/startup/db_redis')(); //initialise redis.
 
-    //intialize socket
-    await require(`./app/startup/socket`).connect(global.io);
-    await require('./app/startup/expressStartup')(app);
+    await require('./app/startup/db_mongo')(); // initialize mongodb     
+    await require('./app/startup/db_redis')(); //initialise redis.
+    await require(`./app/startup/socket`).connect(global.io); //intialize socket
+    await require('./app/startup/expressStartup')(app); //intialize middleware
+
     return new Promise((resolve, reject) => {
         server.listen(SERVER.SOCKET_PORT, (err) => {
             if (err) reject(err);

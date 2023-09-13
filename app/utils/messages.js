@@ -21,6 +21,7 @@ module.exports = {
         INVALID_MSG_TYPE: "Invalid message type.",
         MEMBERS_DONT_EXIST: "One or more members sent do not exist.",
     },
+    ROOM_DELETED_SUCCESSFULLY: 'Room deleted successfully',
     MESSAGE_SENT: "Message sent successfully.",
     MESSAGE_RECEIVED: 'Message received updated Successfully.',
     MESSAGE_READ: 'Message read updated Successfully.',

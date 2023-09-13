@@ -16,12 +16,9 @@ let notificationController = {};
  * @returns 
  */
 notificationController.saveNotification = async (payload) => {
-    payload.readBy = [];
-    payload.readBy.push(payload.userId);
-    let notification = await dbService.create(NotificationModel, payload);
+    const notification = await dbService.create(NotificationModel, payload);
     return notification;
 };
-
 
 /**
  * Function to list notifications.
@@ -31,7 +28,7 @@ notificationController.saveNotification = async (payload) => {
 notificationController.listNotification = async (payload) => {
 
     let notificationAggregateQuery = [
-        { $match: { readBy: { $nin: [convertIdToMongooseId(payload.userId)] } } },
+        { $match: { readBy: { $nin: [ convertIdToMongooseId(payload.userId) ] } } },
         { $sort: { createdAt: -1 } },
         { $facet: {
             notificationData: [
@@ -46,6 +43,23 @@ notificationController.listNotification = async (payload) => {
     let totalCount = notification.notificationCount.length ? notification.notificationCount[0].total : 0;
     
     return { notification: notification.notificationData, notificationCount: totalCount };
+};
+
+/**
+ * Function to clear notifications.
+ * @param {*} payload 
+ * @returns 
+ */
+notificationController.clearNotification = async (payload) => {
+
+    let criteria = { };
+
+    if (payload.notificationId){
+        criteria['_id'] = payload.notificationId;
+    }
+
+    await dbService.updateMany(NotificationModel, criteria, { $addToSet: { readBy: convertIdToMongooseId(payload.userId) } });
+    return;
 };
 
 /**

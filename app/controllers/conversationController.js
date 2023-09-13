@@ -5,7 +5,7 @@ const CONFIG = require('./../../config');
 const { dbService } = require('../services');
 const { createSuccessResponse } = require('../helpers');
 const { convertIdToMongooseId } = require('../utils/utils');
-const { API_GATEWAY_URL } = require('../../config/microserviceConfig');
+const { AUTHENTICATE_USER } = require('../../config/microserviceConfig');
 const { ConversationRoomModel, ConversationModel } = require('../models');
 const { MESSAGES, PAGINATION, S3_DEFAULT_PROFILE_IMAGE, SORTING, MESSAGE_STATUS } = require('../utils/constants');
 
@@ -13,42 +13,6 @@ const { MESSAGES, PAGINATION, S3_DEFAULT_PROFILE_IMAGE, SORTING, MESSAGE_STATUS 
 ***************** Conversation controller ***************
 **************************************************/
 let conversationController = {};
-
-/**
- * Function to create room.
- * @param {*} payload 
- * @returns 
- */
-conversationController.createRoom = async (payload) => {
-    let dataToSave = {
-        createdBy: payload.userId, updateBy: payload.userId,
-        candidateId: payload.candidateId
-    };
-    if (payload.roomId){
-
-        payload.members = payload.members.map((user) => {
-            return { userId: user };
-        });
-        
-        let roomData = await dbService.findOneAndUpdate(ConversationRoomModel, { _id: payload.roomId }, { $addToSet: { members: { $each: payload.members } } }, { new: true } );
-        return createSuccessResponse(MESSAGES.SUCCESS, roomData);
-    }
-
-    payload.members.push(payload.userId);
-
-    let room = await dbService.findOne(ConversationRoomModel, { members: { $size: payload.members.length }, candidateId: payload.candidateId });
-    if (room) {
-        return createSuccessResponse(MESSAGES.SUCCESS, room);
-    }
-
-    dataToSave['members'] = [];
-    payload.members.forEach(userId => {
-        dataToSave['members'].push({ userId });
-    });
-
-    let data = await dbService.create(ConversationRoomModel, dataToSave);
-    return createSuccessResponse(MESSAGES.CONVERSATION.CREATED, data);
-};
 
 /**
  * Function to get room information.
@@ -67,7 +31,7 @@ conversationController.roomInformation = async (payload) => {
  * @returns 
  */
 conversationController.saveMessage = async (payload) => {
-    let userDatas = await axios.get(`${API_GATEWAY_URL}/v1/dropdown/user`);
+    let userDatas = await axios.get(`${AUTHENTICATE_USER.API_GATEWAY_URL}/v1/dropdown/user`);
 
     let dataToSave = { senderId: payload.userId, readBy: [payload.userId], ...payload };
     let message = await dbService.create(ConversationModel, dataToSave);
@@ -91,7 +55,7 @@ conversationController.saveMessage = async (payload) => {
  * @returns 
  */
 conversationController.getGroupConversation = async (payload) => {
-    let userDatas = await axios.get(`${API_GATEWAY_URL}/v1/dropdown/user`);
+    let userDatas = await axios.get(`${AUTHENTICATE_USER.API_GATEWAY_URL}/v1/dropdown/user`);
     let conversationAggregateQuery = [
         { $match: { roomId: convertIdToMongooseId(payload.roomId) } },
         { $sort: { createdAt: -1 } },
