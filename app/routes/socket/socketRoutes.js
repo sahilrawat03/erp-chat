@@ -92,7 +92,7 @@ let routes = [
         action: 'on',
         eventName: SOCKET_EVENTS.USER_UNREAD_COUNT,
         joiSchemaForSocket: {
-            skip: Joi.number().default(1).optional(),
+            roomId: Joi.string().objectId().required(),
         },
         group: 'message',
         description: 'socket event to get Room\'s unread Count.'

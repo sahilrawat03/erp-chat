@@ -181,7 +181,7 @@ conversationController.messageUpdate = async (payload) => {
 conversationController.getUserUnreadCount = async (payload) => {
 
     let userUnreadCountAggregateQuery = [
-        { $match: { 'members.userId': convertIdToMongooseId(payload.userId) } },
+        { $match: { 'members.userId': convertIdToMongooseId(payload.userId), _id: convertIdToMongooseId(payload.roomId) } },
         { $addFields: { 'userUnreadCount': {
             $filter: {
                 input: '$members',
@@ -189,19 +189,12 @@ conversationController.getUserUnreadCount = async (payload) => {
                 cond: { $and: [{ $eq: [ '$$member.userId', convertIdToMongooseId(payload.userId) ]},{ $ne: [ '$$member.unreadCount', 0 ]}] }
             }}
         }},
-        { $match: { $expr: { $gt: [{ $size: '$userUnreadCount' }, 0] } }},
-        { $group: {
-            _id: null,
-            totalRooms: { $push: '$_id' }
-        }},
-        { $project: {
-            _id: 0,
-            unreadRoomCount: { $size: '$totalRooms' }
-        }}
+        { $match: { $expr: { $gt: [ { $size: '$userUnreadCount' }, 0] } } },
+        { $unwind: '$userUnreadCount' },
     ];
 
     let unreadCount = (await dbService.aggregate(ConversationRoomModel, userUnreadCountAggregateQuery))[0];
-    return createSuccessResponse(MESSAGES.MESSAGE_READ, { totalUnreadCount: (!unreadCount ? 0 : unreadCount.unreadRoomCount) });
+    return createSuccessResponse(MESSAGES.MESSAGE_READ, { totalUnreadCount: (!unreadCount ? 0 : unreadCount.userUnreadCount?.unreadCount) });
 };
 
 /* export controller */

@@ -37,7 +37,7 @@ chatRoomController.createRoom = async (payload) => {
         dataToSave['members'].push({ userId });
     });
 
-    let data = await dbService.findOneAndUpdate(ConversationRoomModel, { _id: payload.roomId }, { $set: dataToSave });
+    let data = await dbService.findOneAndUpdate(ConversationRoomModel, { _id: payload.roomId }, { $set: dataToSave }, { upsert: true });
 
     return createSuccessResponse(MESSAGES.CONVERSATION.CREATED, data);
 };

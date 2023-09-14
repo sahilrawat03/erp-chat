@@ -116,7 +116,6 @@ socketConnection.connect = async function (io) {
         });
 
         socket.on(SOCKET_EVENTS.USER_UNREAD_COUNT, async (payload, callback) => {
-            payload = {};
             payload.userId = socket.id;
 
             let response = await conversationController.getUserUnreadCount(payload);

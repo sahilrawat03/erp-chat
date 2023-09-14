@@ -2,7 +2,7 @@
 
 const axios = require('axios');
 const MICROSERVICE_CONFIG = require('../../config/microserviceConfig');
-const { decryptJwt } = require("../utils/utils");
+const { decryptJwt, convertIdToMongooseId } = require("../utils/utils");
 const dbService = require('../services/dbService');
 const { createErrorResponse } = require("../helpers");
 const { MESSAGES, ERROR_TYPES } = require('../utils/constants');
@@ -79,7 +79,7 @@ authService.socketAuthentication = async (socket, next) => {
         socket.id = userData._id.toString();
         socket.user = userData;
         
-        let roomsData = await dbService.find(ConversationRoomModel, { 'members.userId': userData._id, isDeleted: { $ne: true } });
+        let roomsData = await dbService.find(ConversationRoomModel, { 'members.userId': convertIdToMongooseId(userData._id), isDeleted: { $ne: true } });
         
         for (let room of roomsData) {
             socket.join(room._id.toString());
