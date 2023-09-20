@@ -105,7 +105,7 @@ conversationController.getGroupConversation = async (payload) => {
  * @returns 
  */
 conversationController.getUserRooms = async (payload) => {
-    console.log(payload.userId);
+
     let userDatas = await axios.get(`${API_GATEWAY_URL}/v1/dropdown/user`);
 
     let roomListAggregateQuery = [
@@ -115,9 +115,8 @@ conversationController.getUserRooms = async (payload) => {
                 input: '$members',
                 as: 'member',
                 cond: { $ne: [ '$$member.userId', convertIdToMongooseId(payload.userId) ] }
-            }}
-        }
-        },
+            } }
+        } },
         { $lookup: {
             from: 'conversation',
             let: { conversationRoomId: '$_id' },
@@ -127,7 +126,7 @@ conversationController.getUserRooms = async (payload) => {
                 { $limit: 1 }
             ],  
             as: 'conversation'
-        }},
+        } },
         { $unwind: { path: '$conversation', preserveNullAndEmptyArrays: true } },
         { $addFields: { 'userUnreadCount': {
             $filter: {
@@ -143,13 +142,15 @@ conversationController.getUserRooms = async (payload) => {
             profileImage: { $concat: [ CONFIG.S3_BUCKET.cloudfrontUrl, '/', { $ifNull: [ '$userData.profileImage', S3_DEFAULT_PROFILE_IMAGE ] } ] },
             unreadCount: '$userUnreadCount.unreadCount',
             lastMessage: { $cond: [ '$conversation.message', '$conversation.message', '$conversation.fileName']}
-        }}
+        } }
     ];
     let roomData = await dbService.aggregate(ConversationRoomModel, roomListAggregateQuery);
+
     const userIdToNameMap = {};
     userDatas.data.data.forEach(user => {
       userIdToNameMap[user._id.toString()] = user.name;
     });
+
     // Map the user names to the group members
     let groupWithMappedNames;
     for (let room of roomData) {
