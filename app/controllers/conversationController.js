@@ -69,7 +69,7 @@ conversationController.getGroupConversation = async (payload) => {
                 message: '$message',
                 fileName: '$fileName',
                 fileType: '$fileType',
-                fileUrl: { $concat: [ CONFIG.S3_BUCKET.cloudfrontUrl, '/', '$fileUrl' ] },
+                fileUrl: { $concat: [ CONFIG.S3_BUCKET.cloudfrontUrl, '$fileUrl' ] },
                 senderId: '$senderId',
                 createdAt: '$createdAt',
                 messageStatus: '$messageStatus',
